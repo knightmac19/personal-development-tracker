@@ -518,7 +518,7 @@ export const Journal = () => {
             </div>
           </div>
         ) : (
-          <div className="h-full flex items-center justify-center">
+          <div className="h-full flex items-center justify-center p-4">
             <div className="text-center">
               <BookOpen className="h-16 w-16 text-gray-400 mx-auto mb-4" />
               <p className="text-xl text-gray-600 dark:text-gray-400 mb-4">
