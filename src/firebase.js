@@ -38,7 +38,7 @@ enableIndexedDbPersistence(db).catch((err) => {
 // Whitelist of allowed emails
 export const ALLOWED_EMAILS = [
   // Add your email here
-  "your-email@example.com",
+  "pmdunn78@gmail.com",
 ];
 
 export default app;

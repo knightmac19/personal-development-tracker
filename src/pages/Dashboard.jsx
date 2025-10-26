@@ -23,7 +23,7 @@ import { db } from "../firebase";
 import { format, startOfWeek, startOfMonth, startOfYear } from "date-fns";
 
 export const Dashboard = () => {
-  const { currentUser } = useAuth();
+  const { currentUser, userProfile } = useAuth();
   const [recentGoals, setRecentGoals] = useState([]);
   const [recentJournalEntries, setRecentJournalEntries] = useState([]);
   const [stats, setStats] = useState({
@@ -150,7 +150,8 @@ export const Dashboard = () => {
       {/* Welcome Section */}
       <div className="bg-gradient-to-r from-primary-600 to-primary-700 rounded-lg p-6 text-white">
         <h1 className="text-3xl font-bold mb-2">
-          Welcome back, {currentUser?.email?.split("@")[0]}!
+          Welcome back,{" "}
+          {userProfile?.displayName || currentUser?.email?.split("@")[0]}!
         </h1>
         <p className="opacity-90">{format(new Date(), "EEEE, MMMM d, yyyy")}</p>
       </div>

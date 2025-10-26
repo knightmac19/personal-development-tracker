@@ -141,17 +141,28 @@ export const AuthProvider = ({ children }) => {
     if (!currentUser) return;
 
     try {
-      await setDoc(
-        doc(db, "users", currentUser.uid),
-        {
-          settings,
+      const updateData = {
+        settings: {
+          theme: settings.theme,
+          emailNotifications: settings.emailNotifications,
+          journalReminders: settings.journalReminders,
+          goalDeadlineAlerts: settings.goalDeadlineAlerts,
+          weeklyReports: settings.weeklyReports,
         },
-        { merge: true }
-      );
+      };
+
+      // Add displayName if it's provided
+      if (settings.displayName !== undefined) {
+        updateData.displayName = settings.displayName;
+      }
+
+      await setDoc(doc(db, "users", currentUser.uid), updateData, {
+        merge: true,
+      });
 
       setUserProfile((prev) => ({
         ...prev,
-        settings,
+        ...updateData,
       }));
 
       toast.success("Settings updated");

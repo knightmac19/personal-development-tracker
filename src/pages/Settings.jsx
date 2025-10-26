@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
 import {
@@ -24,6 +24,9 @@ export const Settings = () => {
   const { theme, toggleTheme } = useTheme();
   const [saving, setSaving] = useState(false);
   const [sendingReset, setSendingReset] = useState(false);
+  const [displayName, setDisplayName] = useState(
+    userProfile?.displayName || ""
+  );
 
   const [settings, setSettings] = useState({
     emailNotifications: userProfile?.settings?.emailNotifications || false,
@@ -32,12 +35,27 @@ export const Settings = () => {
     weeklyReports: userProfile?.settings?.weeklyReports || false,
   });
 
+  useEffect(() => {
+    if (userProfile?.displayName) {
+      setDisplayName(userProfile.displayName);
+    }
+    if (userProfile?.settings) {
+      setSettings({
+        emailNotifications: userProfile.settings.emailNotifications || false,
+        journalReminders: userProfile.settings.journalReminders || false,
+        goalDeadlineAlerts: userProfile.settings.goalDeadlineAlerts || true,
+        weeklyReports: userProfile.settings.weeklyReports || false,
+      });
+    }
+  }, [userProfile]);
+
   const handleSaveSettings = async () => {
     setSaving(true);
     try {
       await updateUserSettings({
         ...userProfile?.settings,
         ...settings,
+        displayName,
         theme,
       });
       toast.success("Settings saved successfully");
@@ -91,6 +109,20 @@ export const Settings = () => {
 
         <div className="space-y-4">
           <div>
+            <label className="label">Display Name</label>
+            <input
+              type="text"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              placeholder="Enter your name"
+              className="input"
+            />
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              This is how you'll be greeted in the app
+            </p>
+          </div>
+
+          <div>
             <label className="label">Email Address</label>
             <input
               type="email"
@@ -125,6 +157,26 @@ export const Settings = () => {
               className="input bg-gray-50 dark:bg-gray-800"
             />
           </div>
+        </div>
+
+        <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+          <button
+            onClick={handleSaveSettings}
+            disabled={saving}
+            className="btn-primary flex items-center"
+          >
+            {saving ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save className="h-4 w-4 mr-2" />
+                Save Profile
+              </>
+            )}
+          </button>
         </div>
       </div>
 

@@ -11,10 +11,11 @@ import {
   Settings,
   User,
   Target,
+  ChevronDown,
 } from "lucide-react";
 
 export const Header = () => {
-  const { currentUser, logout } = useAuth();
+  const { currentUser, userProfile, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -72,9 +73,10 @@ export const Header = () => {
               ))}
 
               {/* Dropdown for Life Subsections */}
-              <div className="relative group">
+              <div className="relative group inline-flex">
                 <button className="inline-flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                   Life Areas
+                  <ChevronDown className="ml-1 h-4 w-4" />
                 </button>
                 <div className="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                   <div className="py-1">
@@ -116,7 +118,8 @@ export const Header = () => {
               >
                 <User className="h-5 w-5" />
                 <span className="text-sm">
-                  {currentUser?.email?.split("@")[0]}
+                  {userProfile?.displayName ||
+                    currentUser?.email?.split("@")[0]}
                 </span>
               </button>
 
