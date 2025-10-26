@@ -10,6 +10,8 @@ import {
   Clock,
   ChevronRight,
   Plus,
+  CheckSquare,
+  Trash2,
 } from "lucide-react";
 import {
   collection,
@@ -18,14 +20,23 @@ import {
   orderBy,
   limit,
   getDocs,
+  doc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  serverTimestamp,
 } from "firebase/firestore";
 import { db } from "../firebase";
 import { format, startOfWeek, startOfMonth, startOfYear } from "date-fns";
+import { TodoList } from "../components/common/TodoList";
+import toast from "react-hot-toast";
 
 export const Dashboard = () => {
   const { currentUser, userProfile } = useAuth();
   const [recentGoals, setRecentGoals] = useState([]);
   const [recentJournalEntries, setRecentJournalEntries] = useState([]);
+  const [todayTodos, setTodayTodos] = useState([]);
+  const [weeklyTodos, setWeeklyTodos] = useState([]);
   const [stats, setStats] = useState({
     totalGoals: 0,
     completedGoals: 0,
@@ -92,6 +103,33 @@ export const Dashboard = () => {
       }));
       setRecentJournalEntries(entries);
 
+      // Fetch todos
+      const todayTodosQuery = query(
+        collection(db, "todos"),
+        where("userId", "==", currentUser.uid),
+        where("type", "==", "today"),
+        orderBy("createdAt", "desc")
+      );
+      const todaySnapshot = await getDocs(todayTodosQuery);
+      const todayTodosData = todaySnapshot.docs.map((doc) => ({
+        id: doc.id.replace(`${currentUser.uid}_`, ""),
+        ...doc.data(),
+      }));
+      setTodayTodos(todayTodosData);
+
+      const weeklyTodosQuery = query(
+        collection(db, "todos"),
+        where("userId", "==", currentUser.uid),
+        where("type", "==", "weekly"),
+        orderBy("createdAt", "desc")
+      );
+      const weeklySnapshot = await getDocs(weeklyTodosQuery);
+      const weeklyTodosData = weeklySnapshot.docs.map((doc) => ({
+        id: doc.id.replace(`${currentUser.uid}_`, ""),
+        ...doc.data(),
+      }));
+      setWeeklyTodos(weeklyTodosData);
+
       // Calculate stats
       const allGoalsQuery = query(
         collection(db, "goals"),
@@ -135,6 +173,111 @@ export const Dashboard = () => {
       0
     );
     return Math.round(progressSum / goals.length);
+  };
+
+  const handleAddTodo = async (text, type) => {
+    if (!currentUser) return;
+
+    const todoId = `todo_${Date.now()}`;
+    const newTodo = {
+      text,
+      type,
+      completed: false,
+      userId: currentUser.uid,
+      createdAt: serverTimestamp(),
+    };
+
+    try {
+      await setDoc(doc(db, "todos", `${currentUser.uid}_${todoId}`), newTodo);
+
+      const todoWithId = {
+        id: todoId,
+        ...newTodo,
+        createdAt: { toDate: () => new Date() },
+      };
+
+      if (type === "today") {
+        setTodayTodos([todoWithId, ...todayTodos]);
+      } else {
+        setWeeklyTodos([todoWithId, ...weeklyTodos]);
+      }
+    } catch (error) {
+      console.error("Error adding todo:", error);
+    }
+  };
+
+  const handleToggleTodo = async (todoId, type) => {
+    if (!currentUser) return;
+
+    const todos = type === "today" ? todayTodos : weeklyTodos;
+    const todo = todos.find((t) => t.id === todoId);
+    if (!todo) return;
+
+    try {
+      await updateDoc(doc(db, "todos", `${currentUser.uid}_${todoId}`), {
+        completed: !todo.completed,
+      });
+
+      const updatedTodos = todos.map((t) =>
+        t.id === todoId ? { ...t, completed: !t.completed } : t
+      );
+
+      if (type === "today") {
+        setTodayTodos(updatedTodos);
+      } else {
+        setWeeklyTodos(updatedTodos);
+      }
+    } catch (error) {
+      console.error("Error toggling todo:", error);
+    }
+  };
+
+  const handleDeleteTodo = async (todoId, type) => {
+    if (!currentUser) return;
+
+    try {
+      await deleteDoc(doc(db, "todos", `${currentUser.uid}_${todoId}`));
+
+      if (type === "today") {
+        setTodayTodos(todayTodos.filter((t) => t.id !== todoId));
+      } else {
+        setWeeklyTodos(weeklyTodos.filter((t) => t.id !== todoId));
+      }
+    } catch (error) {
+      console.error("Error deleting todo:", error);
+    }
+  };
+
+  const handleClearAllTodos = async (type) => {
+    const todoList = type === "today" ? todayTodos : weeklyTodos;
+    const confirmMessage = `Are you sure you want to clear all ${
+      type === "today" ? "today's" : "weekly"
+    } todos? This cannot be undone.`;
+
+    if (todoList.length === 0) return;
+
+    if (!confirm(confirmMessage)) return;
+
+    try {
+      const deletePromises = todoList.map((todo) =>
+        deleteDoc(doc(db, "todos", `${currentUser.uid}_${todo.id}`))
+      );
+
+      await Promise.all(deletePromises);
+
+      if (type === "today") {
+        setTodayTodos([]);
+      } else {
+        setWeeklyTodos([]);
+      }
+
+      toast.success(
+        `All ${type === "today" ? "today's" : "weekly"} todos cleared`
+      );
+    } catch (error) {
+      console.error("Error clearing todos:", error);
+      toast.error("Failed to clear todos");
+    }
   };
 
   if (loading) {
@@ -356,6 +499,67 @@ export const Dashboard = () => {
               ))}
             </div>
           )}
+        </div>
+      </div>
+
+      {/* Todos Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Today's Todos */}
+        <div className="card">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
+              <CheckSquare className="h-5 w-5 mr-2 text-blue-600" />
+              Today's Todos
+            </h2>
+            {todayTodos.length > 0 && (
+              <button
+                onClick={() => handleClearAllTodos("today")}
+                className="text-red-600 hover:text-red-700 text-sm font-medium flex items-center"
+                title="Clear all today's todos"
+              >
+                <Trash2 className="h-4 w-4 mr-1" />
+                Clear All
+              </button>
+            )}
+          </div>
+          <TodoList
+            todos={todayTodos}
+            title=""
+            onAddTodo={(text) => handleAddTodo(text, "today")}
+            onToggleTodo={(id) => handleToggleTodo(id, "today")}
+            onDeleteTodo={(id) => handleDeleteTodo(id, "today")}
+            showDate={false}
+            compact={true}
+          />
+        </div>
+
+        {/* Weekly Todos */}
+        <div className="card">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
+              <Calendar className="h-5 w-5 mr-2 text-purple-600" />
+              Weekly Todos
+            </h2>
+            {weeklyTodos.length > 0 && (
+              <button
+                onClick={() => handleClearAllTodos("weekly")}
+                className="text-red-600 hover:text-red-700 text-sm font-medium flex items-center"
+                title="Clear all weekly todos"
+              >
+                <Trash2 className="h-4 w-4 mr-1" />
+                Clear All
+              </button>
+            )}
+          </div>
+          <TodoList
+            todos={weeklyTodos}
+            title=""
+            onAddTodo={(text) => handleAddTodo(text, "weekly")}
+            onToggleTodo={(id) => handleToggleTodo(id, "weekly")}
+            onDeleteTodo={(id) => handleDeleteTodo(id, "weekly")}
+            showDate={false}
+            compact={true}
+          />
         </div>
       </div>
     </div>

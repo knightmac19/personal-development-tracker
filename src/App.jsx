@@ -13,6 +13,8 @@ import { Goals } from "./pages/Goals";
 import { Stats } from "./pages/Stats";
 import { Settings } from "./pages/Settings";
 import { LifeSubsection } from "./pages/LifeSubsection";
+import { MyWeek } from "./pages/MyWeek";
+import { Expenses } from "./pages/Expenses";
 
 function App() {
   return (
@@ -50,6 +52,8 @@ function App() {
                   <Route path="/journal" element={<Journal />} />
                   <Route path="/goals" element={<Goals />} />
                   <Route path="/stats" element={<Stats />} />
+                  <Route path="/my-week" element={<MyWeek />} />
+                  <Route path="/expenses" element={<Expenses />} />
                   <Route path="/settings" element={<Settings />} />
                   <Route
                     path="/subsection/:subsectionName"
