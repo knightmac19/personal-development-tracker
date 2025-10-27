@@ -106,7 +106,7 @@ export const LifeSubsection = () => {
       ],
     },
     attractiveness: {
-      name: "Attractiveness",
+      name: "Attractive",
       icon: "✨",
       color: "bg-yellow-500",
       defaultMetrics: [

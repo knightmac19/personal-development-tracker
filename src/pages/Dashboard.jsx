@@ -358,6 +358,66 @@ export const Dashboard = () => {
         </div>
       </div>
 
+      {/* Todos Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Today's Todos */}
+        <div className="card">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
+              <CheckSquare className="h-5 w-5 mr-2 text-blue-600" />
+              Today's Todos
+            </h2>
+            {todayTodos.length > 0 && (
+              <button
+                onClick={() => handleClearAllTodos("today")}
+                className="text-red-600 hover:text-red-700 text-sm font-medium flex items-center"
+                title="Clear all today's todos"
+              >
+                <Trash2 className="h-4 w-4 mr-1" />
+                Clear All
+              </button>
+            )}
+          </div>
+          <TodoList
+            todos={todayTodos}
+            title=""
+            onAddTodo={(text) => handleAddTodo(text, "today")}
+            onToggleTodo={(id) => handleToggleTodo(id, "today")}
+            onDeleteTodo={(id) => handleDeleteTodo(id, "today")}
+            showDate={false}
+            compact={true}
+          />
+        </div>
+
+        {/* Weekly Todos */}
+        <div className="card">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
+              <Calendar className="h-5 w-5 mr-2 text-purple-600" />
+              Weekly Todos
+            </h2>
+            {weeklyTodos.length > 0 && (
+              <button
+                onClick={() => handleClearAllTodos("weekly")}
+                className="text-red-600 hover:text-red-700 text-sm font-medium flex items-center"
+                title="Clear all weekly todos"
+              >
+                <Trash2 className="h-4 w-4 mr-1" />
+                Clear All
+              </button>
+            )}
+          </div>
+          <TodoList
+            todos={weeklyTodos}
+            title=""
+            onAddTodo={(text) => handleAddTodo(text, "weekly")}
+            onToggleTodo={(id) => handleToggleTodo(id, "weekly")}
+            onDeleteTodo={(id) => handleDeleteTodo(id, "weekly")}
+            showDate={false}
+            compact={true}
+          />
+        </div>
+      </div>
       {/* Life Areas Grid */}
       <div>
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
@@ -499,67 +559,6 @@ export const Dashboard = () => {
               ))}
             </div>
           )}
-        </div>
-      </div>
-
-      {/* Todos Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Today's Todos */}
-        <div className="card">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
-              <CheckSquare className="h-5 w-5 mr-2 text-blue-600" />
-              Today's Todos
-            </h2>
-            {todayTodos.length > 0 && (
-              <button
-                onClick={() => handleClearAllTodos("today")}
-                className="text-red-600 hover:text-red-700 text-sm font-medium flex items-center"
-                title="Clear all today's todos"
-              >
-                <Trash2 className="h-4 w-4 mr-1" />
-                Clear All
-              </button>
-            )}
-          </div>
-          <TodoList
-            todos={todayTodos}
-            title=""
-            onAddTodo={(text) => handleAddTodo(text, "today")}
-            onToggleTodo={(id) => handleToggleTodo(id, "today")}
-            onDeleteTodo={(id) => handleDeleteTodo(id, "today")}
-            showDate={false}
-            compact={true}
-          />
-        </div>
-
-        {/* Weekly Todos */}
-        <div className="card">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
-              <Calendar className="h-5 w-5 mr-2 text-purple-600" />
-              Weekly Todos
-            </h2>
-            {weeklyTodos.length > 0 && (
-              <button
-                onClick={() => handleClearAllTodos("weekly")}
-                className="text-red-600 hover:text-red-700 text-sm font-medium flex items-center"
-                title="Clear all weekly todos"
-              >
-                <Trash2 className="h-4 w-4 mr-1" />
-                Clear All
-              </button>
-            )}
-          </div>
-          <TodoList
-            todos={weeklyTodos}
-            title=""
-            onAddTodo={(text) => handleAddTodo(text, "weekly")}
-            onToggleTodo={(id) => handleToggleTodo(id, "weekly")}
-            onDeleteTodo={(id) => handleDeleteTodo(id, "weekly")}
-            showDate={false}
-            compact={true}
-          />
         </div>
       </div>
     </div>

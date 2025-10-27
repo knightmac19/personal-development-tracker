@@ -280,23 +280,25 @@ export const Expenses = () => {
       {/* Header */}
       <div className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-lg p-6 text-white">
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Expenses</h1>
-            <p className="opacity-90">Track your income and expenses</p>
+          <div className="flex-1 mr-4">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-2">Expenses</h1>
+            <p className="opacity-90 text-sm sm:text-base">
+              Track your income and expenses
+            </p>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex sm:flex-row flex-col items-end sm:items-center sm:space-x-2 space-y-2 sm:space-y-0">
             <button
               onClick={exportToCSV}
-              className="bg-white/20 text-white px-4 py-2 rounded-lg font-medium hover:bg-white/30 transition-colors flex items-center"
+              className="bg-white/20 text-white px-3 sm:px-4 py-2 rounded-lg font-medium hover:bg-white/30 transition-colors flex items-center text-sm sm:text-base whitespace-nowrap"
             >
-              <Download className="h-5 w-5 mr-2" />
+              <Download className="h-4 sm:h-5 w-4 sm:w-5 mr-1 sm:mr-2" />
               Export
             </button>
             <button
               onClick={() => setShowAddForm(true)}
-              className="bg-white text-green-600 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors flex items-center"
+              className="bg-white text-green-600 px-3 sm:px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors flex items-center text-sm sm:text-base whitespace-nowrap"
             >
-              <Plus className="h-5 w-5 mr-2" />
+              <Plus className="h-4 sm:h-5 w-4 sm:w-5 mr-1 sm:mr-2" />
               Add Transaction
             </button>
           </div>
