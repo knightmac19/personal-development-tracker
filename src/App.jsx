@@ -15,6 +15,7 @@ import { Settings } from "./pages/Settings";
 import { LifeSubsection } from "./pages/LifeSubsection";
 import { MyWeek } from "./pages/MyWeek";
 import { Expenses } from "./pages/Expenses";
+import { Consistency } from "./pages/Consistency";
 
 function App() {
   return (
@@ -50,6 +51,7 @@ function App() {
                 <Routes>
                   <Route path="/" element={<Dashboard />} />
                   <Route path="/journal" element={<Journal />} />
+                  <Route path="/consistency" element={<Consistency />} />
                   <Route path="/goals" element={<Goals />} />
                   <Route path="/stats" element={<Stats />} />
                   <Route path="/my-week" element={<MyWeek />} />
